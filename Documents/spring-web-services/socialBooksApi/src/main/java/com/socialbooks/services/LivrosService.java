@@ -1,12 +1,15 @@
 package com.socialbooks.services;
 
+import java.util.Date;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
+import com.socialbooks.domain.Comentario;
 import com.socialbooks.domain.Livro;
+import com.socialbooks.repository.ComentariosRepository;
 import com.socialbooks.repository.LivrosRepository;
 import com.socialbooks.services.exceptions.LivroNaoEncontradoException;
 
@@ -15,6 +18,9 @@ public class LivrosService {
 
 	@Autowired
 	private LivrosRepository livrosRepository;
+	
+	@Autowired
+	private ComentariosRepository comentariosRepository;
 	
 	public List<Livro> listar(){
 		return this.livrosRepository.findAll();
@@ -49,5 +55,18 @@ public class LivrosService {
 	
 	private void verificarExistencia(Livro livro) throws LivroNaoEncontradoException{
 		buscar(livro.getId());
+	}
+	
+	public Comentario salvarComentario(Long idLivro, Comentario comentario){
+		Livro livro = buscar(idLivro);
+		
+		comentario.setLivro(livro);
+		comentario.setData(new Date());
+		return this.comentariosRepository.save(comentario);
+	}
+
+	public List<Comentario> listarComentarios(Long livroid) throws LivroNaoEncontradoException{
+		Livro livro = buscar(livroid);				
+		return livro.getComentarios();
 	}
 }
